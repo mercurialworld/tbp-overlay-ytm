@@ -1,6 +1,6 @@
 # YouTube Music Desktop Bridge
 
-Meant to be used with [th-ch's YouTube Music client](https://github.com/th-ch/youtube-music/tree/master).
+For use with [TheBlackParrot's](https://theblackparrot.me) [stream overlays](https://theblackparrot.me/overlays). Developed for [th-ch's YouTube Music client](https://github.com/th-ch/youtube-music/tree/master).
 
 Make sure the API Server (Beta) plugin is enabled.
 
