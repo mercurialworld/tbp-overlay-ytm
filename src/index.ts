@@ -1,5 +1,4 @@
 import { WebSocketServer } from "ws";
-import { Config, YTM_API_URL } from "./config";
 import {
     ParrotAlbum,
     ParrotAlbumArt,
@@ -7,6 +6,11 @@ import {
     ParrotTrackData,
 } from "./types/parrot";
 import { YTMResponse } from "./types/ytmresponse";
+
+const configPath = Bun.file("./config.json");
+const Config = await configPath.json();
+
+const YTM_API_URL = `${Config.ytmURL}:${Config.ytmPort}/api/v1/song`;
 
 class SocketData {
     currentTrack: ParrotTrackData | null;

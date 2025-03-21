@@ -2,13 +2,17 @@
 
 Meant to be used with [th-ch's YouTube Music client](https://github.com/th-ch/youtube-music/tree/master).
 
-Make sure the API Server (Beta) plugin is enabled.
+Make sure the API Server (Beta) plugin is enabled on the YouTube Music side.
+
+On the overlay side, it's preferred to turn the "Show album metadata along with artist metadata" option off if you're playing user-uploaded videos. You *must* leave the "Show release year after album information" option disabled, the API does not expose proper release dates and instead exposes upload times.
 
 ## Setup
 
-Configuration is done in `src/config.ts`.
+Download the latest release from the releases page, and extract everything into its own folder. Make sure you rename `config.sample.json` to `config.json` and configure your player/overlay websocket things there.
 
-On the overlay side, it's preferred to turn the "Show album metadata along with artist metadata" option off if you're playing user-uploaded videos. You *must* leave the "Show release year after album information" option disabled, the API does not expose proper release dates and instead exposes upload times.
+Then, run the `tbpytmbridge` executable.
+ 
+## Development
 
 This project was created using `bun init` in bun v1.0.6. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
 

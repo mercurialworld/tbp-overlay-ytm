@@ -1,0 +1,7 @@
+{
+    "ytmURL": "http://127.0.0.1",
+    "ytmPort": 26538,
+
+    "parrotURL": "127.0.0.1",
+    "parrotPort": 8989
+}
