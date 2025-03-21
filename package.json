@@ -1,0 +1,15 @@
+{
+  "name": "tbp-overlay-ytmdesktop",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "prettier": "^3.5.3",
+    "ws": "^8.18.1"
+  }
+}
