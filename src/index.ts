@@ -45,6 +45,7 @@ class SocketData {
 
         var albumArt: ParrotAlbumArt = { type: null, data: null };
         if (data.imageSrc) {
+            // TODO: crop to square if it's not of type audio
             const img = await fetch(data.imageSrc, { method: "GET" })
                 .then((res) => res.blob())
                 .then((resBlob) => resBlob.arrayBuffer())

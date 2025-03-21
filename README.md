@@ -6,6 +6,10 @@ Make sure the API Server (Beta) plugin is enabled.
 
 ## Setup
 
+Configuration is done in `src/config.ts`.
+
+On the overlay side, it's preferred to turn the "Show album metadata along with artist metadata" option off if you're playing user-uploaded videos. You *must* leave the "Show release year after album information" option disabled, the API does not expose proper release dates and instead exposes upload times.
+
 This project was created using `bun init` in bun v1.0.6. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
 
 To install dependencies:
