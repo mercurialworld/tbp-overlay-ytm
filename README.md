@@ -1,6 +1,6 @@
 # YouTube Music Desktop Bridge
 
-Meant to be used with [th-ch's YouTube Music client](https://github.com/th-ch/youtube-music/tree/master).
+For use with [TheBlackParrot's](https://theblackparrot.me) [stream overlays](https://theblackparrot.me/overlays). Developed for [th-ch's YouTube Music client](https://github.com/th-ch/youtube-music/tree/master).
 
 Make sure the API Server (Beta) plugin is enabled on the YouTube Music side.
 
@@ -30,6 +30,7 @@ bun run src/index.ts
 
 # License 
 
+```
 YouTube Music Bridge Script for TheBlackParrot's Stream Overlays
 Copyright (C) 2025 mercurialworld 
 
@@ -45,3 +46,4 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
