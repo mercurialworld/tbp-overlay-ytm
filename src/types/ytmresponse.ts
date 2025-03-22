@@ -13,7 +13,7 @@ export interface YTMResponse {
     imageSrc?: string;
     isPaused: boolean;
     songDuration: number;
-    elapsedSeconds: 95;
+    elapsedSeconds: number;
     url?: string;
     album?: string | null;
     videoId: string;
