@@ -3,7 +3,8 @@
   "module": "src/index.ts",
   "type": "module",
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "npm-run-all": "^4.1.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -11,5 +12,11 @@
   "dependencies": {
     "prettier": "^3.5.3",
     "ws": "^8.18.1"
+  },
+  "scripts": {
+    "base-build": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts",
+    "build:windows": "bun run base-build --target=bun-windows-x64 --outfile=out/windows-x64/tbpytmbridge",
+    "build:linux": "bun run base-build --target=bun-linux-x64 --outfile=out/linux-x64/tbpytmbridge",
+    "build": "npm-run-all build:*"
   }
 }

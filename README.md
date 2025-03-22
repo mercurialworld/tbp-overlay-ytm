@@ -8,7 +8,7 @@ On the overlay side, it's preferred to turn the "Show album metadata along with 
 
 ## Setup
 
-Download the latest release from the releases page, and extract everything into its own folder. Make sure you rename `config.sample.json` to `config.json` and configure your player/overlay websocket things there.
+Download the latest release from the releases page, and extract everything into its own folder. Make sure you configure your player/overlay websocket things in `config.json`.
 
 Then, run the `tbpytmbridge` executable.
  

@@ -7,20 +7,17 @@ import {
 } from "./types/parrot";
 import { YTMResponse } from "./types/ytmresponse";
 
-const configPath = Bun.file("./config.json");
-const Config = await configPath.json();
-
-const YTM_API_URL = `${Config.ytmURL}:${Config.ytmPort}/api/v1/song`;
-
 class SocketData {
     currentTrack: ParrotTrackData | null;
     currentState: ParrotStateData | null;
     isPaused: boolean;
+    hasSongChanged: boolean;
 
     constructor() {
         this.currentTrack = null;
         this.currentState = null;
         this.isPaused = false;
+        this.hasSongChanged = false;
     }
 
     processYear(date: string): number {
@@ -28,15 +25,26 @@ class SocketData {
         return theDate.getFullYear();
     }
 
-    async setCurrentTrack(data: YTMResponse) {
-        if (
+    isCurrentSong(data: YTMResponse): boolean {
+        return (
             this.currentTrack?.title == data.title &&
             this.currentTrack.artists[0] == data.artist
-        ) {
+        );
+    }
+
+    toggleNewSong() {
+        this.hasSongChanged = !this.hasSongChanged;
+        console.log(
+            `Song change variable has now been set to ${this.hasSongChanged}`,
+        );
+    }
+
+    async setCurrentTrack(data: YTMResponse) {
+        if (this.isCurrentSong(data)) {
             return;
         }
 
-        console.log("New song, setting current track");
+        console.log(`Now playing: ${data.artist} - ${data.title}`);
 
         var album: ParrotAlbum = { year: null, name: null };
         if (data.album && data.uploadDate) {
@@ -69,11 +77,7 @@ class SocketData {
             art: albumArt,
         };
 
-        if (socketClients.length > 0) {
-            socketClients.forEach((socket) => {
-                socket.send(this.sendTrackData());
-            });
-        }
+        this.toggleNewSong();
     }
 
     updateState(data: YTMResponse) {
@@ -93,50 +97,60 @@ class SocketData {
         return JSON.stringify({ event: "track", data: this.currentTrack });
     }
 }
-const socketData = new SocketData();
 
-const parrotSocket = new WebSocketServer({
-    host: Config.parrotURL,
-    port: Config.parrotPort,
-});
-const socketClients: any[] = [];
+class OverlayWS {
+    parrotSocket: WebSocketServer;
+    socketClients: any[];
+    socketData: SocketData;
 
-parrotSocket.on("connection", async (socket, req) => {
-    console.log("Connected to TheBlackParrot's overlay suite!");
-    socketClients.push(socket);
+    constructor(url: string, port: number, socketData: SocketData) {
+        this.parrotSocket = new WebSocketServer({
+            host: url,
+            port: port,
+        });
+        this.socketClients = [];
+        this.socketData = socketData;
 
-    if (socketData.currentTrack !== null) {
-        console.log("Sending track data from new connection");
-        socket.send(socketData.sendTrackData());
+        this.parrotSocket.on("connection", async (socket, req) => {
+            console.log("Connected to TheBlackParrot's overlay suite!");
+            this.socketClients.push(socket);
+
+            if (this.socketData.currentTrack !== null) {
+                console.log("Sending track data from new connection");
+                socket.send(this.socketData.sendTrackData());
+                this.socketData.toggleNewSong();
+            }
+
+            socket.on("close", () => {
+                console.log("Overlay disconnected");
+                this.socketClients.splice(this.socketClients.indexOf(socket), 1);
+            });
+        });
     }
-
-    socket.on("close", function () {
-        console.log("Overlay disconnected");
-        socketClients.splice(socketClients.indexOf(socket), 1);
-    });
-});
+}
 
 function delay(time: number) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-async function getYTMInfo() {
+async function getYTMInfo(url: string, overlayWS: OverlayWS) {
     while (true) {
-        const ytmResult = await fetch(YTM_API_URL, { method: "GET" });
+        const ytmResult = await fetch(url, { method: "GET" });
         if (ytmResult.ok) {
             var txt = await ytmResult.text();
             const songInfo: YTMResponse = JSON.parse(txt);
 
-            console.log(
-                `${songInfo.artist} - ${songInfo.title} (${songInfo.elapsedSeconds} / ${songInfo.songDuration})`,
-            );
+            await overlayWS.socketData.setCurrentTrack(songInfo);
+            overlayWS.socketData.updateState(songInfo);
 
-            await socketData.setCurrentTrack(songInfo);
-            socketData.updateState(songInfo);
-
-            if (socketClients.length > 0) {
-                socketClients.forEach((socket) => {
-                    socket.send(socketData.sendStateData());
+            if (overlayWS.socketClients.length > 0) {
+                overlayWS.socketClients.forEach((socket) => {
+                    socket.send(overlayWS.socketData.sendStateData());
+                    if (overlayWS.socketData.hasSongChanged) {
+                        console.log("Sending new song to overlay");
+                        socket.send(overlayWS.socketData.sendTrackData());
+                        overlayWS.socketData.toggleNewSong();
+                    }
                 });
             }
         } else {
@@ -148,4 +162,15 @@ async function getYTMInfo() {
     }
 }
 
-await getYTMInfo();
+async function main() {
+    const configPath = Bun.file("./config.json");
+    const Config = await configPath.json();
+    const socketData = new SocketData();
+    const overlayWS = new OverlayWS(Config.parrotURL, Config.parrotPort, socketData);
+
+    const YTM_API_URL = `${Config.ytmURL}:${Config.ytmPort}/api/v1/song`;
+
+    await getYTMInfo(YTM_API_URL, overlayWS);
+}
+
+main();
