@@ -6,7 +6,7 @@ In the [Releases page](https://github.com/mercurialworld/tbp-overlay-ytm/release
 
 ![A screenshot of the releases page for this program. The "windows-x64.zip" asset is highlighted.](assets/ghreleases.png)
 
-Regardless of which operating system you're using, the contents of the compressed folder are as follows. Make sure you put these two files in their own folder when you extract them:
+Regardless of which operating system you're using, the contents of the compressed folder are as follows. Make sure you put these two files in the same folder, beside each other, when you extract them:
 
 ```
 windows-x64.zip
