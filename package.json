@@ -14,7 +14,7 @@
     "ws": "^8.18.1"
   },
   "scripts": {
-    "base-build": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts",
+    "base-build": "bun build --compile --minify --sourcemap ./src/index.ts",
     "build:windows": "bun run base-build --target=bun-windows-x64 --outfile=out/windows-x64/tbpytmbridge",
     "build:linux": "bun run base-build --target=bun-linux-x64 --outfile=out/linux-x64/tbpytmbridge",
     "build": "npm-run-all build:*"
