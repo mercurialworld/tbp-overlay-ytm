@@ -37,6 +37,8 @@ If you are on Linux, **you must have a protocol in front of the URL/IP address (
 
 ## YouTube Music
 
+**Make sure you are using [th-ch's YouTube Music desktop client](https://github.com/th-ch/youtube-music)!!**
+
 ![A picture of th-ch's YouTube Music client. There is a long dropdown of plugins. The "API Server (Beta)" plugin is hovered over. It is enabled, and of note is that the "Authorization strategy" option is set to "No authorization".](assets/ytmclientsettings.png)
 
 Make sure you enable the "API Server (Beta)" plugin. **Set the authorization strategy to "No authorization".** 
