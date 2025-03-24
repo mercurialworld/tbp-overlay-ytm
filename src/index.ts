@@ -6,6 +6,7 @@ import {
     ParrotTrackData,
 } from "./types/parrot";
 import { YTMResponse } from "./types/ytmresponse";
+import { logOverlay, logPlayer, logProgram, logSongData } from "./logger";
 
 class SocketData {
     currentTrack: ParrotTrackData | null;
@@ -34,7 +35,7 @@ class SocketData {
 
     toggleNewSong() {
         this.hasSongChanged = !this.hasSongChanged;
-        console.log(
+        logSongData(
             `Song change variable has now been set to ${this.hasSongChanged}`,
         );
     }
@@ -44,7 +45,7 @@ class SocketData {
             return;
         }
 
-        console.log(`Now playing: ${data.artist} - ${data.title}`);
+        logSongData(`Now playing: ${data.artist} - ${data.title}`);
 
         var album: ParrotAlbum = { year: null, name: null };
         if (data.album && data.uploadDate) {
@@ -112,25 +113,21 @@ class OverlayWS {
         this.socketData = socketData;
 
         this.parrotSocket.on("connection", async (socket, req) => {
-            console.log("Connected to TheBlackParrot's overlay suite!");
+            logOverlay("Connected to TheBlackParrot's overlay suite!");
             this.socketClients.push(socket);
 
             if (this.socketData.currentTrack !== null) {
-                console.log("Sending track data from new connection");
+                logOverlay("Sending track data from new connection");
                 socket.send(this.socketData.sendTrackData());
                 this.socketData.toggleNewSong();
             }
 
             socket.on("close", () => {
-                console.log("Overlay disconnected");
+                logOverlay("Overlay disconnected");
                 this.socketClients.splice(this.socketClients.indexOf(socket), 1);
             });
         });
     }
-}
-
-function delay(time: number) {
-    return new Promise((resolve) => setTimeout(resolve, time));
 }
 
 async function getYTMInfo(url: string, overlayWS: OverlayWS) {
@@ -147,7 +144,7 @@ async function getYTMInfo(url: string, overlayWS: OverlayWS) {
                 overlayWS.socketClients.forEach((socket) => {
                     socket.send(overlayWS.socketData.sendStateData());
                     if (overlayWS.socketData.hasSongChanged) {
-                        console.log("Sending new song to overlay");
+                        logPlayer("Sending new song to overlay");
                         socket.send(overlayWS.socketData.sendTrackData());
                         overlayWS.socketData.toggleNewSong();
                     }
@@ -155,16 +152,20 @@ async function getYTMInfo(url: string, overlayWS: OverlayWS) {
             }
         } else {
             var message = await ytmResult.text();
-            console.log(`No song, message is ${message}`);
+            logPlayer(`No song, message is ${message}`);
         }
 
-        await delay(1000);
+        await Bun.sleep(1000);
     }
 }
 
 async function main() {
+    logProgram("v0.1.4");
+
     const configPath = Bun.file("./config.json");
     const Config = await configPath.json();
+    logProgram("Config loaded!");
+
     const socketData = new SocketData();
     const overlayWS = new OverlayWS(Config.parrotURL, Config.parrotPort, socketData);
 
